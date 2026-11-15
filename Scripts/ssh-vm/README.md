@@ -13,6 +13,8 @@ Domyślny klucz prywatny: `~/.ssh/ssh_key`.
 
 ## Użycie
 
+Poniższe przykłady zakładają, że jesteś w katalogu ze skryptem. Jak wywoływać go z dowolnego miejsca (alias, symlink, `PATH`) opisuje sekcja [Wywoływanie z dowolnego katalogu](#wywoływanie-z-dowolnego-katalogu).
+
 ```bash
 ./gcp-ssh.sh                 # krótka pomoc (bez parametrów)
 ./gcp-ssh.sh --help          # to samo co powyżej
@@ -51,20 +53,21 @@ Logowanie SSH wymaga uruchomionej VM. Jeśli VM jest wyłączona, skrypt kończy
 
 Flaga `--stop` (`-s`) zamiast logowania zatrzymuje wybraną VM przez `gcloud compute instances stop` i czeka na stan `TERMINATED` (domyślnie do 300 s). VM już wyłączona kończy się komunikatem bez ponownego wywołania `stop`. W trybie `--stop` klucz SSH nie jest wymagany. Zatrzymaną VM uruchom ponownie przez `--start`.
 
-## Konfiguracja, żeby wywoływać jedną komendą
+## Wywoływanie z dowolnego katalogu
 
-Skrypt musi być wykonywalny:
+Skrypt leży w `Scripts/ssh-vm/`, więc `./gcp-ssh.sh` działa tylko po wejściu do tego katalogu. Żeby uruchamiać go jedną komendą z dowolnego miejsca, najpierw nadaj mu prawo wykonywania:
 
 ```bash
-chmod +x ~/Documents/Development/private-Kamil_Karcz/Scripts/gcp-ssh.sh
+chmod +x "$HOME/Documents/Development/pm-ai-assistant/Scripts/ssh-vm/gcp-ssh.sh"
 ```
 
-Wybierz jedną z poniższych opcji.
+Następnie wybierz jedną z poniższych opcji.
 
-### Opcja 1: symlink w katalogu z PATH (zalecane)
+### Opcja 1: alias w `~/.zshrc` (najprostsza)
 
 ```bash
-ln -sf ~/Documents/Development/private-Kamil_Karcz/Scripts/gcp-ssh.sh /usr/local/bin/gcp-ssh
+echo "alias gcp-ssh='$HOME/Documents/Development/pm-ai-assistant/Scripts/ssh-vm/gcp-ssh.sh'" >> ~/.zshrc
+source ~/.zshrc
 ```
 
 Od teraz w dowolnym katalogu:
@@ -76,27 +79,61 @@ gcp-ssh ssh-vm --start
 gcp-ssh ssh-vm --stop
 ```
 
-Jeśli `/usr/local/bin` nie istnieje lub nie masz uprawnień, użyj `~/bin` i dodaj go do PATH (patrz opcja 3).
+Alias działa tylko w interaktywnych powłokach — nie zadziała w skryptach ani gdy wywołujesz `gcp-ssh` z innego programu. W takich przypadkach użyj opcji 2 lub 3.
 
-### Opcja 2: alias w `~/.zshrc`
+### Opcja 2: symlink w `~/bin` (zalecana)
 
 ```bash
-echo "alias gcp-ssh='$HOME/Documents/Development/private-Kamil_Karcz/Scripts/gcp-ssh.sh'" >> ~/.zshrc
+mkdir -p "$HOME/bin"
+ln -sf "$HOME/Documents/Development/pm-ai-assistant/Scripts/ssh-vm/gcp-ssh.sh" "$HOME/bin/gcp-ssh"
+```
+
+Dodaj `~/bin` do `PATH` (jednorazowo), jeśli jeszcze go tam nie ma:
+
+```bash
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-### Opcja 3: dodanie katalogu skryptów do PATH w `~/.zshrc`
+Sprawdzenie:
 
 ```bash
-echo 'export PATH="$HOME/Documents/Development/private-Kamil_Karcz/Scripts:$PATH"' >> ~/.zshrc
+command -v gcp-ssh    # powinno wskazać ~/bin/gcp-ssh
+```
+
+Symlink jest lepszy od kopiowania: po `git pull` od razu używasz nowej wersji skryptu, bo wskazuje na plik w repo.
+
+### Opcja 3: `/usr/local/bin`
+
+Jeśli wolisz katalog systemowy, pamiętaj, że na macOS jest on własnością `root`, więc `ln` wymaga `sudo`:
+
+```bash
+sudo ln -sf "$HOME/Documents/Development/pm-ai-assistant/Scripts/ssh-vm/gcp-ssh.sh" /usr/local/bin/gcp-ssh
+```
+
+`/usr/local/bin` jest zwykle już w `PATH`, więc nie trzeba nic dopisywać. Ten sam efekt daje symlink w `~/bin` bez `sudo` — opcja 2 jest bezpieczniejsza.
+
+### Opcja 4: katalog skryptów w `PATH`
+
+```bash
+echo 'export PATH="$HOME/Documents/Development/pm-ai-assistant/Scripts/ssh-vm:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Wtedy wystarczy nazwa pliku:
+Wtedy wywołujesz skrypt razem z rozszerzeniem:
 
 ```bash
 gcp-ssh.sh
+gcp-ssh.sh ssh-vm --list
 ```
+
+### Którą opcję wybrać
+
+| Sytuacja | Opcja |
+|---|---|
+| Chcesz tylko pisać `gcp-ssh` w terminalu | 1 (alias) |
+| Chcesz `gcp-ssh` także w skryptach i innych programach | 2 (symlink w `~/bin`) lub 3 |
+| Nie chcesz zmieniać `PATH` | 3 (wymaga `sudo`) |
 
 ## Zmienne środowiskowe
 
