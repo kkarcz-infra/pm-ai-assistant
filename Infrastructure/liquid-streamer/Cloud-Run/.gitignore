@@ -1,0 +1,42 @@
+# Zależności Node.js — odtwarzalne z package-lock.json, duże.
+node_modules/
+
+# Sekrety lokalne. .env.example jest szablonem bez sekretów i MUSI być w repo.
+.env
+.env.*
+!.env.example
+
+# Logi lokalne i artefakty uruchomień.
+*.log
+
+# Środowisko wirtualne Pythona z ansible-core i PyMySQL.
+.venv-ansible/
+
+# Pliki retry i cache Ansible.
+ansible/*.retry
+ansible/**/*.retry
+
+# Terraform: providery, moduły i cache pobierane przez `terraform init`.
+**/.terraform/
+
+# Stan Terraform zawiera wartości wrażliwe (m.in. hasło bazy) — nigdy do repo.
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Wartości zmiennych mogą zawierać sekrety. Szablony *.example zostają w repo.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Zapisany plan może zawierać wartości wrażliwe.
+tfplan
+
+# Logi awarii Terraform i lokalna konfiguracja CLI.
+crash.log
+crash.*.log
+.terraformrc
+terraform.rc
+
+# Metadane macOS.
+.DS_Store

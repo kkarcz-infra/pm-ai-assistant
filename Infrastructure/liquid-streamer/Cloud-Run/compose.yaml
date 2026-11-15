@@ -1,0 +1,38 @@
+# Lokalny MySQL dla Etapu 1.
+#
+# Aplikacja uruchamiana jest wtedy z hosta przez `npm run dev`, więc wystawiamy
+# tylko port bazy. W Etapie 2 dojdzie usługa `app` budowana z Dockerfile.
+#
+# Pliki z db/migrations są montowane do docker-entrypoint-initdb.d i wykonują się
+# tylko przy pierwszym utworzeniu wolumenu (w kolejności alfabetycznej).
+# Reset bazy: `docker compose down -v`, potem ponownie `docker compose up -d db`.
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cloudrun-lab-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_local_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-appdb}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app_local_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # $$ chroni $ przed interpolacją przez Compose — zmienna jest czytana
+      # wewnątrz kontenera.
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  db-data:

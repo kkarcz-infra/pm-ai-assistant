@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1120" />
+    <title>Cloud Run Lab</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">Cloud Run Lab · Warszawa</p>
+      <h1 id="title">Ładowanie…</h1>
+      <p class="subtitle">
+        Publiczny licznik wizyt. Frontend, Express i MySQL działają w jednym
+        przepływie, a stan przeżywa restart instancji.
+      </p>
+
+      <section class="counter" aria-live="polite">
+        <span id="total" class="total">–</span>
+        <span class="label">wizyt łącznie</span>
+      </section>
+
+      <button id="visit" type="button">Odwiedź ponownie</button>
+
+      <dl class="meta">
+        <div>
+          <dt>Instancja</dt>
+          <dd><code id="instance">–</code></dd>
+        </div>
+        <div>
+          <dt>Rewizja</dt>
+          <dd><code id="revision">–</code></dd>
+        </div>
+        <div>
+          <dt>Region</dt>
+          <dd><code id="region">–</code></dd>
+        </div>
+      </dl>
+
+      <section class="recent-section">
+        <h2>Ostatnie instancje</h2>
+        <ul id="recent" class="recent"></ul>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
