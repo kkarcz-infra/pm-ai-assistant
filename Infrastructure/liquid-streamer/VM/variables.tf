@@ -1,13 +1,25 @@
 variable "instance_name" {
   description = "Nazwa instancji VM"
   type        = string
-  default     = "ssh-vm"
+  default     = "workstation"
+}
+
+variable "region" {
+  description = "Region GCP"
+  type        = string
+  default     = "europe-central2"
+}
+
+variable "zone" {
+  description = "Strefa GCP (musi należeć do regionu podsieci)"
+  type        = string
+  default     = "europe-central2-a"
 }
 
 variable "machine_type" {
   description = "Typ maszyny"
   type        = string
-  default     = "e2-micro"
+  default     = "e2-medium"
 }
 
 variable "ssh_user" {

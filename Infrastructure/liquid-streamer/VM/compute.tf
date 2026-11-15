@@ -6,7 +6,7 @@ resource "google_service_account" "vm" {
 resource "google_compute_instance" "vm" {
   name         = var.instance_name
   machine_type = var.machine_type
-  zone         = "us-central1-c"
+  zone         = var.zone
   tags         = ["ssh"]
   labels       = { purpose = "ssh" }
 

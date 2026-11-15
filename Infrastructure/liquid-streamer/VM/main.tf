@@ -15,8 +15,8 @@ terraform {
 
 provider "google" {
   project = "liquid-streamer-284510"
-  region  = "us-central1"
-  zone    = "us-central1-c"
+  region  = var.region
+  zone    = var.zone
 }
 
 resource "google_compute_network" "vpc_network" {
@@ -24,8 +24,8 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_subnetwork" "main" {
-  name          = "main-subnet-us-central1"
+  name          = "main-subnet-${var.region}"
   network       = google_compute_network.vpc_network.id
-  region        = "us-central1"
+  region        = var.region
   ip_cidr_range = "10.10.0.0/24"
 }
